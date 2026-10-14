@@ -1,0 +1,625 @@
+<title>Skills Register</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,750&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<!--
+  Skills Guardian register page. The design lives here; the data is inserted between the
+  REGISTRY markers by scripts/registry.py on every `update`. Do not edit generated copies by hand.
+-->
+<style>
+  /* Layout: a study file. Header and index, locations, chains, filterable cards, maintenance, how it works. */
+  :root {
+    --paper: #f2f4f1;
+    --card: #fbfcfa;
+    --ink: #1b2422;
+    --muted: #5a6762;
+    --line: #d3dbd6;
+    --l0: #3b4c9e; --l0-soft: #e3e7f5;
+    --l1: #4a7529; --l1-soft: #e3edd9;
+    --l2: #7a5a14; --l2-soft: #f3ead3;
+    --l3: #6b3f8f; --l3-soft: #ede3f4;
+    --l4: #1f6f73; --l4-soft: #dceeee;
+    --warn: #a3441d;
+    --warn-soft: #f6e4da;
+    --focus: #3b4c9e;
+    --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+    --f-mono: "JetBrains Mono", Consolas, "Courier New", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #121715; --card: #182019; --ink: #e3eae5; --muted: #97a49e; --line: #2b3531;
+      --l0: #a3b1f2; --l0-soft: #1f2641; --l1: #a2cb7f; --l1-soft: #1d2a17; --l2: #e0bf72; --l2-soft: #2e2614;
+      --l3: #cba8e8; --l3-soft: #2a1f33; --l4: #7fd0d3; --l4-soft: #14292a;
+      --warn: #e8956f; --warn-soft: #35211a; --focus: #a3b1f2; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #121715; --card: #182019; --ink: #e3eae5; --muted: #97a49e; --line: #2b3531;
+    --l0: #a3b1f2; --l0-soft: #1f2641; --l1: #a2cb7f; --l1-soft: #1d2a17; --l2: #e0bf72; --l2-soft: #2e2614;
+    --l3: #cba8e8; --l3-soft: #2a1f33; --l4: #7fd0d3; --l4-soft: #14292a;
+    --warn: #e8956f; --warn-soft: #35211a; --focus: #a3b1f2; color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper); color: var(--ink);
+    font-family: var(--f-body); font-size: 1rem; line-height: 1.55;
+    padding-inline: 16px; padding-block: 0 56px;
+  }
+  .wrap { max-width: 1260px; margin-inline: auto; display: grid; gap: 44px; }
+  h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+  p { margin: 0; }
+  code, .mono { font-family: var(--f-mono); font-size: .86em; }
+  .eyebrow { font-size: .75rem; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+  [hidden] { display: none !important; }
+
+  /* Location colors (assigned by order: first location l0, second l1…) */
+  .l0 { --c: var(--l0); --c-soft: var(--l0-soft); }
+  .l1 { --c: var(--l1); --c-soft: var(--l1-soft); }
+  .l2 { --c: var(--l2); --c-soft: var(--l2-soft); }
+  .l3 { --c: var(--l3); --c-soft: var(--l3-soft); }
+  .l4 { --c: var(--l4); --c-soft: var(--l4-soft); }
+
+  /* Header */
+  header.top { padding-block: 44px 0; display: grid; gap: 14px; }
+  header.top h1 { font-size: clamp(2.1rem, 5vw, 3.2rem); font-weight: 750; line-height: 1.05; letter-spacing: -.01em; }
+  header.top .lead { max-width: 62ch; color: var(--muted); font-size: 1.08rem; }
+  .tally, .stats { display: flex; flex-wrap: wrap; gap: 8px 22px; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .tally b, .stats b { color: var(--ink); font-family: var(--f-display); font-size: 1.15rem; }
+
+  section > h2 { font-size: 1.55rem; margin-bottom: 6px; }
+  section > .sub { color: var(--muted); max-width: 66ch; margin-bottom: 18px; }
+
+  /* Index */
+  .index { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+  .ix-col { border: 1px solid var(--line); border-top: 4px solid var(--c, var(--line)); border-radius: 10px; background: var(--card); padding: 14px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+  .ix-col.warn { --c: var(--warn); }
+  .ix-col h3 { font-size: 1rem; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .ix-col h3 span { font-family: var(--f-body); font-weight: 400; font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .ix-col ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .ix-col a { display: grid; text-decoration: none; color: var(--ink); padding: 5px 8px; margin-inline: -8px; border-radius: 6px; }
+  .ix-col a:hover { background: var(--paper); }
+  .ix-col a b { font-family: var(--f-mono); font-size: .84rem; font-weight: 600; overflow-wrap: anywhere; }
+  .ix-col a small { color: var(--muted); font-size: .82rem; }
+  .ix-col .m { font-family: var(--f-body); font-size: .68rem; font-weight: 600; letter-spacing: .05em; color: var(--warn); margin-left: 6px; }
+  .ix-prev { color: var(--muted); font-size: .88rem; margin-top: 12px; }
+
+  /* Locations */
+  .homes { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .home { border: 1px solid var(--line); border-top: 4px solid var(--c); border-radius: 10px; padding: 18px; display: grid; gap: 10px; background: var(--card); min-width: 0; }
+  .home h2 { font-size: 1.25rem; }
+  .home p { color: var(--muted); }
+  .path { display: flex; align-items: center; gap: 8px; min-width: 0; background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 6px 6px 6px 10px; }
+  .path code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+
+  /* Chains */
+  .flows { display: grid; gap: 16px; }
+  .flow { border: 1px solid var(--line); border-radius: 10px; background: var(--card); padding: 16px 18px; display: grid; gap: 12px; }
+  .flow h3 { font-size: 1.05rem; }
+  .steps { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; list-style: none; margin: 0; padding: 0; }
+  .steps li { display: flex; align-items: center; gap: 8px; }
+  .steps li + li::before { content: "→"; color: var(--muted); }
+  .step { border-radius: 8px; padding: 6px 10px; font-size: .92rem; display: grid; line-height: 1.3; background: var(--c-soft, var(--paper)); }
+  .step small { color: var(--muted); font-size: .78rem; }
+  .step b { font-family: var(--f-mono); font-size: .82rem; font-weight: 600; }
+
+  /* Filters */
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 18px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip-btn { font: inherit; font-size: .92rem; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 5px 14px; cursor: pointer; }
+  .chip-btn[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .search { flex: 1 1 220px; min-width: 0; font: inherit; padding: 7px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink); }
+  .count { color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
+
+  /* Cards */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 560px), 1fr)); gap: 20px; }
+  .skill { border: 1px solid var(--line); border-radius: 10px; background: var(--card); padding: 22px 24px; display: grid; gap: 14px; align-content: start; min-width: 0; box-shadow: inset 4px 0 0 var(--c); scroll-margin-top: 16px; }
+  .skill-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+  .skill-head h3 { font-family: var(--f-mono); font-size: 1.08rem; font-weight: 600; margin-right: auto; overflow-wrap: anywhere; }
+  .tag { font-size: .74rem; font-weight: 600; letter-spacing: .04em; border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
+  .tag.loc { background: var(--c-soft); color: var(--c); }
+  .tag.mod { background: var(--warn-soft); color: var(--warn); }
+  .tag.kind { background: var(--paper); color: var(--muted); border: 1px solid var(--line); }
+  .by { color: var(--muted); font-size: .88rem; margin-top: -6px; }
+  .what { font-size: 1.02rem; }
+  .inst { display: grid; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+  .parts, .out { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: .9rem; }
+  .parts > li { display: grid; grid-template-columns: minmax(0, 13em) 1fr; gap: 2px 12px; }
+  .parts code { overflow-wrap: anywhere; }
+  .pf { min-width: 0; }
+  .elems { list-style: none; margin: 6px 0 2px; padding: 0; display: grid; gap: 4px; font-size: .86rem; color: var(--muted); }
+  .elems li { position: relative; padding-left: 1.4em; }
+  .elems li::before { content: "→"; position: absolute; left: 0; }
+  .elems b { color: var(--ink); font-weight: 600; }
+  .out li { position: relative; padding-left: 1em; color: var(--muted); }
+  .out li::before { content: "–"; position: absolute; left: 0; }
+  .meta { display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; font-size: .93rem; margin: 0; }
+  .meta dt { color: var(--muted); font-weight: 600; }
+  .meta dd { margin: 0; min-width: 0; }
+  .meta dd.mono { overflow-wrap: anywhere; }
+  .where { font-size: .86rem; color: var(--muted); display: grid; gap: 6px; }
+  .ex { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .ex li { display: flex; gap: 8px; align-items: flex-start; background: var(--paper); border-radius: 6px; padding: 7px 8px 7px 12px; }
+  .ex li span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .ex li.no { background: transparent; border: 1px dashed var(--line); color: var(--muted); }
+  .ex li.no b { font-weight: 600; }
+  .ex.ask li { background: var(--l0-soft); }
+  .copy { font: inherit; font-size: .76rem; flex: none; border: 1px solid var(--line); background: var(--card); color: var(--muted); border-radius: 5px; padding: 2px 8px; cursor: pointer; }
+  .copy:hover { color: var(--ink); border-color: var(--muted); }
+  .card-foot { border-top: 1px solid var(--line); padding-top: 8px; display: grid; }
+  .up { font-size: .82rem; color: var(--muted); justify-self: start; }
+  .empty { color: var(--muted); padding: 24px 0; }
+  .skill.flash, .box.warn.flash { outline: 2px solid var(--focus); outline-offset: 3px; }
+
+  /* Maintenance */
+  .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .stack { display: grid; gap: 16px; align-content: start; }
+  .box { border: 1px solid var(--line); border-radius: 10px; background: var(--card); padding: 18px; display: grid; gap: 10px; min-width: 0; }
+  .box.warn { border-color: var(--warn); background: var(--warn-soft); scroll-margin-top: 16px; }
+  .box h3 { font-size: 1.1rem; }
+  .box ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
+
+  /* How it works */
+  .guard { border: 1px solid var(--line); border-radius: 12px; background: var(--card); padding: 22px; display: grid; gap: 22px; }
+  .guard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; }
+  .guard-side { display: grid; gap: 22px; align-content: start; min-width: 0; }
+  .guard h3 { font-size: 1.05rem; margin-bottom: 10px; }
+  .protocol { list-style: none; margin: 0; padding: 0; counter-reset: p; display: grid; gap: 12px; }
+  .protocol li { counter-increment: p; display: grid; grid-template-columns: 2em 1fr; gap: 0 8px; }
+  .protocol li::before { content: counter(p); grid-row: span 2; font-family: var(--f-display); font-weight: 750; font-size: 1.15rem; line-height: 1.3; color: var(--l0); }
+  .protocol span { color: var(--muted); font-size: .93rem; }
+  .rules { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
+  .pipeline { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .pipeline li { display: flex; align-items: center; gap: 8px; }
+  .pipeline li + li::before { content: "→"; color: var(--muted); }
+  .pipeline span { display: grid; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: .88rem; }
+  .pipeline small { color: var(--muted); }
+  .guard p.note { color: var(--muted); }
+  footer { color: var(--muted); font-size: .88rem; }
+  footer a { color: inherit; }
+
+  @media (max-width: 520px) {
+    .meta { grid-template-columns: 1fr; }
+    .meta dt { margin-top: 4px; }
+    .parts > li { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow" id="stamp"></span>
+    <h1 id="title"></h1>
+    <p class="lead" data-t="lead"></p>
+    <div class="tally" id="tally"></div>
+  </header>
+
+  <section id="index" tabindex="-1">
+    <h2 data-t="index_h"></h2>
+    <p class="sub" data-t="index_sub"></p>
+    <div class="index" id="index-cols"></div>
+    <p class="ix-prev" id="ix-prev" hidden></p>
+  </section>
+
+  <div class="homes" id="homes"></div>
+
+  <section id="chains" hidden>
+    <h2 data-t="chains_h"></h2>
+    <p class="sub" data-t="chains_sub"></p>
+    <div class="flows" id="flows"></div>
+  </section>
+
+  <section>
+    <h2 data-t="cards_h"></h2>
+    <p class="sub" data-t="cards_sub"></p>
+    <div class="controls">
+      <div class="chips" role="group" id="chips"></div>
+      <input id="q" class="search" type="search">
+      <span class="count" id="count" aria-live="polite"></span>
+    </div>
+    <div class="grid" id="grid"></div>
+    <p class="empty" id="empty" hidden data-t="empty"></p>
+  </section>
+
+  <section>
+    <h2 data-t="maint_h"></h2>
+    <div class="two">
+      <div class="box">
+        <h3 data-t="uninstall_h"></h3>
+        <ul id="uninstall"></ul>
+      </div>
+      <div class="stack" id="rejected"></div>
+    </div>
+  </section>
+
+  <section id="how">
+    <h2 data-t="how_h"></h2>
+    <p class="sub" data-t="how_sub"></p>
+    <div class="guard">
+      <div class="stats" id="gstats"></div>
+      <div class="guard-grid">
+        <div>
+          <h3 data-t="protocol_h"></h3>
+          <ol class="protocol" id="protocol"></ol>
+        </div>
+        <div class="guard-side">
+          <div>
+            <h3 data-t="rules_h"></h3>
+            <ul class="rules" id="rules"></ul>
+          </div>
+          <div>
+            <h3 data-t="pipeline_h"></h3>
+            <ol class="pipeline" id="pipeline"></ol>
+            <p class="note" data-t="pipeline_note"></p>
+          </div>
+          <div>
+            <h3 data-t="where_all_h"></h3>
+            <dl class="meta" id="where-all"></dl>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer id="foot"></footer>
+</div>
+
+<!-- REGISTRY:START -->
+<script id="registry" type="application/json">{"schema":1,"language":"en","updated":"","html":"","notes_dir":"","locations":{"global":{"label":"Global","path":"~/.claude/skills/"}},"entries":[]}</script>
+<!-- REGISTRY:END -->
+
+<script>
+const T = {
+  en: {
+    title: "Skills Register",
+    stamp: "Skills Guardian · updated {date}",
+    lead: "What each installed skill does, which requests trigger it and where it lives. Global skills work in every project; project skills only load when a session opens in that folder.",
+    index_h: "Index", index_sub: "Every skill, grouped by location. Click a name to jump to its card.",
+    preexisting: "No card, installed before this register: {list}.",
+    loc_eyebrow: "Location {n}",
+    chains_h: "How they chain together", chains_sub: "Some skills are meant to be used in sequence. Each step ends with your approval before the next one starts.",
+    cards_h: "Cards", cards_sub: "The examples are real requests you can copy and paste. To force a skill instead of waiting for it to trigger, type /skill-name.",
+    filter_label: "Filter by location", all: "All", adjusted_chip: "Adjusted",
+    search_ph: "Search: tests, HTML, security…", search_label: "Search skills",
+    count: "{n} of {total}", empty: "No skill matches the search.",
+    t_installed: "skills installed", t_global: "global", t_in: "in {label}", t_adjusted: "adjusted", t_rejected1: "rejected", t_rejectedN: "rejected",
+    kind: { plugin: "Plugin", mcp: "MCP server", hook: "Hook", program: "Program" },
+    tag_adjusted: "Adjusted", ix_adjusted: "ADJUSTED", rejected_col: "Rejected", rejected_default: "Evaluated and not installed",
+    since: "since {date}",
+    installed_h: "What was installed and what each part does", left_out_h: "What was left out",
+    triggers: "Triggers", changes: "Changes", extra: "Also",
+    where_h: "Where it lives", note_label: "Evaluation note:",
+    examples_h: "Example requests", not_trigger: "Does not trigger it:",
+    ask_h: "Ask for a full explanation of the skill",
+    ask: "Explain the skill {name} in detail. It is installed in {path}. Read its SKILL.md and the rest of its files, and tell me what each section does, when it triggers, what it runs on my computer and what data it uses, which other skills it works with, and give me an example of using it in one of my projects.",
+    ask_note: " Also use the note {note} to explain what was adjusted and what was left out.",
+    copy: "Copy", copy_ask: "Copy request", copied: "Copied", selected: "Selected",
+    back: "↑ Back to index",
+    maint_h: "Maintenance", uninstall_h: "How to uninstall",
+    uninstall: [
+      "Any skill: delete its folder in the location shown on its card, and ask skills-guardian to update this register.",
+      "Then open a new session: the list of skills loads at startup.",
+      "To isolate a problem, move the folder instead of deleting it."
+    ],
+    rejected_box: "Rejected: {name}", note_prefix: "Note:",
+    how_h: "How this register is built",
+    how_sub: "This page is maintained by skills-guardian, a Claude skill. Before anything that extends Claude is installed (skills, plugins, MCP servers, hooks or programs), it runs a prudence protocol. Then it records the result here: what was installed and what was rejected.",
+    s_registered: "in the register", s_installed: "installed", s_adjusted: "adjusted", s_rejected1: "rejected", s_rejectedN: "rejected", s_notes: "evaluation notes", s_env1: "isolated environment", s_envN: "isolated environments",
+    protocol_h: "The protocol, step by step",
+    protocol: [
+      ["Identify what it really is", "A skill, a plugin, an MCP server or a program. A link from a video often points to something else."],
+      ["Review trust and code", "Author, stars, license, activity and known vulnerabilities. Anything that runs on its own is always read: hooks, scripts and automatic commands."],
+      ["Write an evaluation note", "What it is, how far to trust it, what it is for and how it would affect each project. Saved in the notes folder."],
+      ["Propose a location and a form", "Only the useful parts, in the project where they will be used, without hooks when they are not needed."],
+      ["Wait for the \"yes\"", "Nothing is installed without explicit approval. If something serious shows up, it stops even if it was already requested."],
+      ["Install and verify", "The reviewed version is copied and compared file by file with the original. Every adjustment is written in the skill's header."],
+      ["Update this register", "The card is added with what was installed, what each part does and what was left out."]
+    ],
+    rules_h: "Rules that always apply",
+    rules: [
+      "Nothing is installed without being read first.",
+      "Selective installs: from a pack of hundreds of skills, only the useful ones.",
+      "Project level by default; global only when it helps everywhere.",
+      "Heavy programs go into isolated environments, outside synced folders, with a pinned version.",
+      "No self-installs: if something is missing, the skill stops and asks.",
+      "Private data in your projects stays excluded.",
+      "Rejections are recorded too, with their reasons."
+    ],
+    pipeline_h: "How this page is generated",
+    pipe: [["the data of every card"], ["registry.py update", "validates and inserts the data"], ["This page", "rebuilt from the template"]],
+    pipeline_note: "The script rejects an incomplete card without touching the page. registry.py audit compares what is on disk with the register and flags anything installed without going through the protocol.",
+    where_all_h: "Where everything lives", w_skill: "Skill", w_register: "Register", w_notes: "Notes",
+    foot: "Made with Skills Guardian."
+  },
+  es: {
+    title: "Registro de skills",
+    stamp: "Skills Guardian · actualizado el {date}",
+    lead: "Qué hace cada skill instalada, qué pedido la activa y en qué carpeta vive. Las globales sirven en cualquier proyecto; las de un proyecto solo se cargan al abrir una sesión en esa carpeta.",
+    index_h: "Índice", index_sub: "Todas las skills, ordenadas por ubicación. Al tocar un nombre, la página baja hasta su ficha.",
+    preexisting: "Sin ficha, instaladas antes de este registro: {list}.",
+    loc_eyebrow: "Ubicación {n}",
+    chains_h: "Cómo se encadenan", chains_sub: "Varias skills están pensadas para usarse en secuencia. Cada paso termina con tu aprobación antes de pasar al siguiente.",
+    cards_h: "Fichas", cards_sub: "Los ejemplos son pedidos reales que puedes copiar y pegar. Para forzar una skill sin esperar a que se active sola, escribe /nombre-de-la-skill.",
+    filter_label: "Filtrar por ubicación", all: "Todas", adjusted_chip: "Ajustadas",
+    search_ph: "Buscar: tests, HTML, seguridad…", search_label: "Buscar skills",
+    count: "{n} de {total}", empty: "Ninguna skill coincide con la búsqueda.",
+    t_installed: "skills instaladas", t_global: "globales", t_in: "en {label}", t_adjusted: "ajustadas", t_rejected1: "descartada", t_rejectedN: "descartadas",
+    kind: { plugin: "Plugin", mcp: "Servidor MCP", hook: "Hook", program: "Programa" },
+    tag_adjusted: "Ajustada", ix_adjusted: "AJUSTADA", rejected_col: "Descartadas", rejected_default: "Evaluada y no instalada",
+    since: "desde el {date}",
+    installed_h: "Qué se instaló y para qué sirve cada parte", left_out_h: "Qué quedó afuera",
+    triggers: "Se activa", changes: "Cambios", extra: "Además",
+    where_h: "Dónde está alojada", note_label: "Nota de evaluación:",
+    examples_h: "Ejemplos de pedido", not_trigger: "No la activa:",
+    ask_h: "Pedir una explicación completa de la skill",
+    ask: "Explícame en detalle la skill {name}, instalada en {path}. Lee su SKILL.md y el resto de sus archivos, y cuéntame qué hace cada sección, cuándo se activa, qué ejecuta en mi computadora y qué datos usa, con qué otras skills se combina y dame un ejemplo de uso en uno de mis proyectos.",
+    ask_note: " Usa también la nota {note} para explicarme qué se ajustó y qué quedó afuera.",
+    copy: "Copiar", copy_ask: "Copiar pedido", copied: "Copiado", selected: "Seleccionado",
+    back: "↑ Volver al índice",
+    maint_h: "Mantenimiento", uninstall_h: "Cómo desinstalar",
+    uninstall: [
+      "Cualquier skill: borrar su carpeta en la ubicación que indica la ficha, y pedirle a skills-guardian que actualice este registro.",
+      "Después, abrir una sesión nueva: la lista de skills se carga al iniciar.",
+      "Para aislar un problema, mover la carpeta en vez de borrarla."
+    ],
+    rejected_box: "Descartada: {name}", note_prefix: "Nota:",
+    how_h: "Cómo se arma este registro",
+    how_sub: "Esta página la mantiene skills-guardian, una skill de Claude. Antes de instalar cualquier cosa que amplíe a Claude (skills, plugins, servidores MCP, hooks o programas), aplica un protocolo de prudencia. Después registra el resultado aquí: lo que se instaló y lo que se descartó.",
+    s_registered: "en el registro", s_installed: "instaladas", s_adjusted: "con ajustes", s_rejected1: "descartada", s_rejectedN: "descartadas", s_notes: "notas de evaluación", s_env1: "entorno aislado", s_envN: "entornos aislados",
+    protocol_h: "El protocolo, paso a paso",
+    protocol: [
+      ["Identificar qué es realmente", "Skill, plugin, servidor MCP o programa. Muchas veces el link de un video apunta a otra cosa."],
+      ["Revisar confiabilidad y código", "Autor, estrellas, licencia, actividad y vulnerabilidades conocidas. Siempre se lee lo que se ejecuta solo: hooks, scripts y comandos automáticos."],
+      ["Escribir una nota de evaluación", "Qué es, cuánto confiar, para qué sirve y cómo afectaría a cada proyecto. Queda en la carpeta de notas."],
+      ["Proponer ubicación y forma", "Solo las partes útiles, en el proyecto donde se van a usar y sin hooks si no hacen falta."],
+      ["Esperar el \"sí\"", "Nada se instala sin aprobación explícita. Si aparece algo grave, se frena aunque ya se haya pedido."],
+      ["Instalar y verificar", "Se copia la versión revisada y se compara archivo por archivo con el original. Cada ajuste queda anotado en el encabezado de la skill."],
+      ["Actualizar este registro", "Se agrega la ficha con qué se instaló, para qué sirve cada parte y qué quedó afuera."]
+    ],
+    rules_h: "Criterios que se mantienen siempre",
+    rules: [
+      "No se instala nada que no se haya leído antes.",
+      "Instalación selectiva: de un paquete de cientos de skills, solo las útiles.",
+      "A nivel de proyecto por defecto; global solo si sirve en todos.",
+      "Los programas pesados van en entornos aislados, fuera de carpetas sincronizadas y con versión fijada.",
+      "Sin autoinstalaciones: si falta algo, la skill se detiene y avisa.",
+      "Los datos privados de los proyectos quedan excluidos.",
+      "Lo descartado también se registra, con sus razones."
+    ],
+    pipeline_h: "Cómo se genera esta página",
+    pipe: [["los datos de cada ficha"], ["registry.py update", "valida e inserta los datos"], ["Esta página", "reconstruida desde la plantilla"]],
+    pipeline_note: "El script rechaza una ficha incompleta sin tocar la página. Además, registry.py audit compara lo instalado en disco con lo registrado y avisa si algo se instaló sin pasar por el protocolo.",
+    where_all_h: "Dónde vive cada cosa", w_skill: "Skill", w_register: "Registro", w_notes: "Notas",
+    foot: "Hecho con Skills Guardian."
+  }
+};
+
+const R = JSON.parse(document.getElementById("registry").textContent);
+const lang = T[R.language] ? R.language : "en";
+const t = T[lang];
+const fill = (s, v) => String(s).replace(/\{(\w+)\}/g, (_, k) => (v && k in v ? v[k] : ""));
+const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const locale = R.locale || lang;
+const fmtDate = iso => { try { return iso ? new Date(iso + "T12:00:00").toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" }) : ""; } catch (e) { return iso; } };
+const sid = e => "sk-" + String(e.location || "x") + "-" + String(e.name).replace(/[^A-Za-z0-9._-]/g, "-");
+const byName = (a, b) => a.name.localeCompare(b.name, lang);
+const baseName = p => String(p || "").split(/[\\/]/).filter(Boolean).pop() || "";
+const sepOf = p => (String(p).includes("\\") ? "\\" : "/");
+const joinPath = (dir, name) => { const d = String(dir || ""); const s = sepOf(d); return (d.endsWith(s) ? d : d + s) + name + s; };
+
+document.documentElement.lang = lang;
+document.querySelectorAll("[data-t]").forEach(el => { el.textContent = t[el.dataset.t] || ""; });
+
+const locs = R.locations || {};
+const locKeys = Object.keys(locs);
+const locClass = key => "l" + (Math.max(0, locKeys.indexOf(key)) % 5);
+const entries = R.entries || [];
+const installed = entries.filter(e => e.status === "installed");
+const rejected = entries.filter(e => e.status === "rejected");
+const installedNames = new Map(installed.map(e => [e.name, e]));
+
+document.getElementById("title").textContent = R.title || t.title;
+document.getElementById("stamp").textContent = fill(t.stamp, { date: fmtDate(R.updated) });
+
+/* Tally */
+const tally = [[installed.length, t.t_installed]];
+locKeys.forEach(k => tally.push([installed.filter(e => e.location === k).length, k === "global" ? t.t_global : fill(t.t_in, { label: locs[k].label })]));
+tally.push([installed.filter(e => e.changes).length, t.t_adjusted]);
+tally.push([rejected.length, rejected.length === 1 ? t.t_rejected1 : t.t_rejectedN]);
+document.getElementById("tally").innerHTML = tally.map(([n, s]) => `<span><b>${n}</b> ${esc(s)}</span>`).join("");
+
+/* Locations */
+document.getElementById("homes").innerHTML = locKeys.map((k, i) => { const l = locs[k]; return `
+  <div class="home ${locClass(k)}">
+    <span class="eyebrow">${esc(fill(t.loc_eyebrow, { n: i + 1 }))}</span>
+    <h2>${esc(l.title || l.label)}</h2>
+    <p>${esc(l.desc || "")}</p>
+    <div class="path"><code>${esc(l.path)}</code><button class="copy" type="button" data-copy="${esc(l.path)}">${esc(t.copy)}</button></div>
+  </div>`; }).join("");
+
+/* Chains */
+const chains = Array.isArray(R.chains) ? R.chains : [];
+if (chains.length) {
+  document.getElementById("chains").hidden = false;
+  document.getElementById("flows").innerHTML = chains.map(c => `
+    <div class="flow"><h3>${esc(c.title)}</h3><ol class="steps">${(c.steps || []).map(s => {
+      const e = s.skill ? installedNames.get(s.skill) : null;
+      const cls = e ? locClass(e.location) : "l0";
+      const head = s.skill ? `<b>${esc(s.skill)}</b>` : esc(s.label);
+      return `<li><span class="step ${cls}">${head}${s.note ? `<small>${esc(s.note)}</small>` : ""}</span></li>`;
+    }).join("")}</ol></div>`).join("");
+}
+
+/* Filters */
+const chips = [["all", t.all], ...locKeys.map(k => [k, locs[k].label]), ["adjusted", t.adjusted_chip]];
+const chipsEl = document.getElementById("chips");
+chipsEl.setAttribute("aria-label", t.filter_label);
+chipsEl.innerHTML = chips.map(([k, s]) => `<button class="chip-btn" type="button" data-filter="${esc(k)}" aria-pressed="false">${esc(s)}</button>`).join("");
+const q = document.getElementById("q");
+q.placeholder = t.search_ph;
+q.setAttribute("aria-label", t.search_label);
+
+/* Cards */
+const notesDir = R.notes_dir || "";
+const isNoteFile = n => /^[^\s\\/]+\.md$/i.test(String(n || ""));  /* a file name, not a description */
+function card(e) {
+  const l = locs[e.location] || { label: e.location, path: "" };
+  const path = joinPath(l.path, e.name);
+  const kind = t.kind[e.kind] ? `<span class="tag kind">${esc(t.kind[e.kind])}</span>` : "";
+  const parts = (e.installed || []).map(p => {
+    const el = (p.elements || []).map(x => `<li><b>${esc(x.name)}</b>: ${esc(x.purpose)}</li>`).join("");
+    return `<li><code>${esc(p.part)}</code><div class="pf">${esc(p.purpose)}${el ? `<ul class="elems">${el}</ul>` : ""}</div></li>`;
+  }).join("");
+  const out = (e.left_out || []).map(x => `<li>${esc(x)}</li>`).join("");
+  const ex = (e.examples || []).map(x => `<li><span>${esc(x)}</span><button class="copy" type="button" data-copy="${esc(x)}">${esc(t.copy)}</button></li>`).join("")
+    + (e.not_triggered_by ? `<li class="no"><span><b>${esc(t.not_trigger)}</b> ${esc(e.not_triggered_by)}</span></li>` : "");
+  const ns = sepOf(notesDir);
+  const notePath = isNoteFile(e.note) && notesDir ? (notesDir.endsWith(ns) ? notesDir : notesDir + ns) + e.note : "";
+  const ask = fill(t.ask, { name: e.name, path }) + (notePath ? fill(t.ask_note, { note: notePath }) : "");
+  return `<article class="skill ${locClass(e.location)}" id="${sid(e)}" tabindex="-1" data-loc="${esc(e.location)}" data-adjusted="${e.changes ? 1 : 0}">
+    <div class="skill-head"><h3>${esc(e.name)}</h3>
+      ${kind}<span class="tag loc">${esc(l.label)}</span>${e.changes ? `<span class="tag mod">${esc(t.tag_adjusted)}</span>` : ""}</div>
+    <p class="by">${esc(e.source)} · ${esc(fill(t.since, { date: fmtDate(e.date) }))}</p>
+    <p class="what">${esc(e.what)}</p>
+    ${parts || out ? `<div class="inst">
+      ${parts ? `<span class="eyebrow">${esc(t.installed_h)}</span><ul class="parts">${parts}</ul>` : ""}
+      ${out ? `<span class="eyebrow">${esc(t.left_out_h)}</span><ul class="out">${out}</ul>` : ""}
+    </div>` : ""}
+    <dl class="meta">
+      <dt>${esc(t.triggers)}</dt><dd>${esc(e.triggers)}</dd>
+      ${e.changes ? `<dt>${esc(t.changes)}</dt><dd>${esc(e.changes)}</dd>` : ""}
+      ${e.extra ? `<dt>${esc(t.extra)}</dt><dd class="mono">${esc(e.extra)}</dd>` : ""}
+    </dl>
+    <div class="where">
+      <span class="eyebrow">${esc(t.where_h)}</span>
+      <div class="path"><code>${esc(path)}</code><button class="copy" type="button" data-copy="${esc(path)}">${esc(t.copy)}</button></div>
+      <span>${esc(t.note_label)} <span class="mono">${esc(e.note)}</span></span>
+    </div>
+    <div><span class="eyebrow">${esc(t.examples_h)}</span><ul class="ex">${ex}</ul></div>
+    <div><span class="eyebrow">${esc(t.ask_h)}</span>
+      <ul class="ex ask"><li><span>${esc(ask)}</span><button class="copy" type="button" data-copy="${esc(ask)}">${esc(t.copy_ask)}</button></li></ul></div>
+    <div class="card-foot"><a class="up" href="#index" data-target="index">${esc(t.back)}</a></div>
+  </article>`;
+}
+const grid = document.getElementById("grid");
+grid.innerHTML = installed.map(card).join("");
+const cards = [...grid.children];
+
+/* Index */
+const ixCols = locKeys.map(k => {
+  const items = installed.filter(e => e.location === k).sort(byName);
+  if (!items.length) return "";
+  return `<div class="ix-col ${locClass(k)}"><h3>${esc(locs[k].label)} <span>${items.length}</span></h3><ol>${items.map(e =>
+    `<li><a href="#${sid(e)}" data-target="${sid(e)}"><b>${esc(e.name)}${e.changes ? `<span class="m">${esc(t.ix_adjusted)}</span>` : ""}</b><small>${esc(e.summary || "")}</small></a></li>`).join("")}</ol></div>`;
+});
+if (rejected.length) {
+  ixCols.push(`<div class="ix-col warn"><h3>${esc(t.rejected_col)} <span>${rejected.length}</span></h3><ol>${[...rejected].sort(byName).map(e =>
+    `<li><a href="#${sid(e)}" data-target="${sid(e)}"><b>${esc(e.name)}</b><small>${esc(e.summary || t.rejected_default)}</small></a></li>`).join("")}</ol></div>`);
+}
+document.getElementById("index-cols").innerHTML = ixCols.join("");
+const pre = (R.preexisting || []).map(n => `<code>${esc(n)}</code>`).join(", ");
+if (pre) {
+  const p = document.getElementById("ix-prev");
+  p.innerHTML = fill(esc(t.preexisting), { list: pre });
+  p.hidden = false;
+}
+
+/* Maintenance */
+const un = [...t.uninstall];
+document.getElementById("uninstall").innerHTML =
+  `<li>${esc(un[0])}</li>`
+  + installed.filter(e => e.uninstall_extra).map(e => `<li><b>${esc(e.name)}</b>: ${esc(e.uninstall_extra)}</li>`).join("")
+  + un.slice(1).map(s => `<li>${esc(s)}</li>`).join("");
+document.getElementById("rejected").innerHTML = rejected.map(e => `
+  <div class="box warn" id="${sid(e)}" tabindex="-1">
+    <h3>${esc(fill(t.rejected_box, { name: e.name }))}</h3>
+    <p>${esc(e.what)}</p>
+    ${Array.isArray(e.reasons) && e.reasons.length ? `<ul>${e.reasons.map(r => `<li>${esc(r)}</li>`).join("")}</ul>` : ""}
+    <p class="mono">${esc(t.note_prefix)} ${esc(e.note)}</p>
+  </div>`).join("");
+
+/* How it works */
+const notes = new Set(entries.map(e => e.note).filter(isNoteFile));
+const envs = new Set(installed.flatMap(e => (e.installed || []).map(p => p.part)).filter(p => /venv/i.test(p)));
+document.getElementById("gstats").innerHTML = [
+  [entries.length, t.s_registered],
+  [installed.length, t.s_installed],
+  [installed.filter(e => e.changes).length, t.s_adjusted],
+  [rejected.length, rejected.length === 1 ? t.s_rejected1 : t.s_rejectedN],
+  [notes.size, t.s_notes],
+  [envs.size, envs.size === 1 ? t.s_env1 : t.s_envN]
+].map(([n, s]) => `<span><b>${n}</b> ${esc(s)}</span>`).join("");
+document.getElementById("protocol").innerHTML = t.protocol.map(([h, s]) => `<li><b>${esc(h)}</b><span>${esc(s)}</span></li>`).join("");
+document.getElementById("rules").innerHTML = t.rules.map(s => `<li>${esc(s)}</li>`).join("");
+const regFile = baseName(R.registry_file) || "registry.json";
+document.getElementById("pipeline").innerHTML = [[regFile, t.pipe[0][0]], t.pipe[1], t.pipe[2]]
+  .map(([a, b], i) => `<li><span>${i < 2 ? `<code>${esc(a)}</code>` : esc(a)}<small>${esc(b)}</small></span></li>`).join("");
+const whereRows = [[t.w_skill, R.skill_dir], [t.w_register, R.registry_file], [t.w_notes, R.notes_dir]].filter(([, v]) => v);
+document.getElementById("where-all").innerHTML = whereRows.map(([k, v]) => `<dt>${esc(k)}</dt><dd class="mono">${esc(v)}</dd>`).join("");
+document.getElementById("foot").innerHTML = `${esc(t.foot)} <a href="https://github.com/mateobarra2003-ctrl/Skills-Guardian">github.com/mateobarra2003-ctrl/Skills-Guardian</a>`;
+
+/* Filter and search */
+const count = document.getElementById("count");
+const empty = document.getElementById("empty");
+const STORE = "skills-guardian-filter";
+let filter = "all";
+try { const f = localStorage.getItem(STORE); if (f && chips.some(c => c[0] === f)) filter = f; } catch (e) {}
+function apply() {
+  const term = q.value.trim().toLowerCase();
+  let shown = 0;
+  cards.forEach(c => {
+    const okF = filter === "all" || (filter === "adjusted" ? c.dataset.adjusted === "1" : c.dataset.loc === filter);
+    const okQ = !term || c.textContent.toLowerCase().includes(term);
+    c.hidden = !(okF && okQ);
+    if (!c.hidden) shown++;
+  });
+  count.textContent = fill(t.count, { n: shown, total: cards.length });
+  empty.hidden = shown > 0;
+  document.querySelectorAll("[data-filter]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.filter === filter)));
+}
+document.querySelectorAll("[data-filter]").forEach(b => b.addEventListener("click", () => {
+  filter = b.dataset.filter;
+  try { localStorage.setItem(STORE, filter); } catch (e) {}
+  apply();
+}));
+q.addEventListener("input", apply);
+
+/* Index navigation: if the card is hidden by a filter, show everything first */
+const reduceMotion = (() => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; } })();
+document.addEventListener("click", ev => {
+  const a = ev.target.closest("a[data-target]");
+  if (!a) return;
+  const el = document.getElementById(a.dataset.target);
+  if (!el) return;
+  ev.preventDefault();
+  if (el.hidden) { filter = "all"; q.value = ""; apply(); }
+  el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+  try { el.focus({ preventScroll: true }); } catch (err) {}
+  if (el.classList.contains("skill") || el.classList.contains("box")) {
+    el.classList.add("flash");
+    setTimeout(() => el.classList.remove("flash"), 1800);
+  }
+});
+
+/* Copy buttons */
+document.addEventListener("click", ev => {
+  const btn = ev.target.closest(".copy");
+  if (!btn) return;
+  const label = btn.dataset.label || (btn.dataset.label = btn.textContent);
+  const done = () => { btn.textContent = t.copied; setTimeout(() => (btn.textContent = label), 1400); };
+  const fallback = () => {
+    const sib = btn.previousElementSibling;
+    if (sib) { const r = document.createRange(); r.selectNodeContents(sib); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+    btn.textContent = t.selected;
+    setTimeout(() => (btn.textContent = label), 1400);
+  };
+  try { navigator.clipboard.writeText(btn.dataset.copy).then(done, fallback); } catch (err) { fallback(); }
+});
+
+apply();
+</script>

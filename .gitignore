@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Pages and notes generated from the example register
+examples/*.html
+examples/notes/
+
+# OS and editors
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "language": "en",
+  "title": "Skills Register",
+  "updated": "2026-10-14",
+  "html": "registry-example.html",
+  "notes_dir": "notes",
+  "published_url": "",
+  "profile": {
+    "about": "Example user: a data analyst, comfortable with spreadsheets, not a professional developer.",
+    "projects": [
+      {"name": "Quarterly reports", "path": "~/work/reports", "kind": "PDF and spreadsheet analysis", "private_data": "~/work/reports/clients"}
+    ]
+  },
+  "locations": {
+    "global": {"label": "Global", "path": "~/.claude/skills/", "desc": "Available in every session, in any folder."},
+    "reports": {"label": "Reports", "title": "Quarterly reports", "path": "~/work/reports/.claude/skills/", "desc": "Only loaded when working on the reports project."}
+  },
+  "preexisting": ["my-old-skill"],
+  "chains": [
+    {"title": "Adding a new skill", "steps": [
+      {"label": "A link from a video", "note": "the starting point"},
+      {"skill": "skills-guardian", "note": "review and note"},
+      {"label": "Your \"yes\"", "note": "only then it is installed"},
+      {"skill": "skills-guardian", "note": "card in this register"}
+    ]}
+  ],
+  "entries": [
+    {
+      "name": "skills-guardian", "kind": "skill", "location": "global", "status": "installed", "date": "2026-10-14",
+      "source": "Skills Guardian · github.com/mateobarra2003-ctrl/Skills-Guardian v1.0.0",
+      "summary": "Install safely and keep this register",
+      "what": "Runs a prudence protocol before anything that extends Claude is installed, and keeps this register up to date.",
+      "triggers": "Before evaluating, installing, adjusting or removing skills, plugins, MCP servers, hooks or programs for Claude, even when it is not named.",
+      "examples": ["Evaluate this skill before I install it: https://github.com/owner/repo", "Remove the skill pdf-tables and update my skills register."],
+      "not_triggered_by": "Install pandas in this project (a normal project dependency).",
+      "note": "The skill's own SKILL.md",
+      "installed": [
+        {"part": "SKILL.md", "purpose": "The protocol Claude follows before installing anything, and how to keep this register.",
+         "elements": [
+           {"name": "First run", "purpose": "Creates the register and asks about your projects."},
+           {"name": "Installation protocol (7 steps)", "purpose": "Identify, review, note, propose, wait for your yes, install and verify, update the register."},
+           {"name": "Keeping the register", "purpose": "Fields of each card, registry.py and audits."}
+         ]},
+        {"part": "scripts/registry.py", "purpose": "Creates and validates the register, rebuilds this page and compares folders."}
+      ],
+      "left_out": ["Nothing: this is the whole skill."]
+    },
+    {
+      "name": "pdf-tables", "kind": "skill", "location": "reports", "status": "installed", "date": "2026-10-14",
+      "source": "Jane Doe · janedoe/pdf-skills @ a1b2c3d",
+      "summary": "Extract tables from PDF reports",
+      "what": "Extracts tables from PDF reports into CSV files, page by page. (Fictional example.)",
+      "triggers": "When I ask to pull a table out of a PDF.",
+      "examples": ["Extract the income statement table from annual-report-2025.pdf.", "Turn every table in the Q3 report into CSV files."],
+      "not_triggered_by": "Summarize this PDF (no tables involved).",
+      "changes": "Uses the isolated environment ~/.venvs/pdf; never installs packages",
+      "extra": "Environment: ~/.venvs/pdf (pdfplumber 0.11.4)",
+      "installed": [
+        {"part": "SKILL.md (adjusted)", "purpose": "The steps to find, extract and check tables.",
+         "elements": [
+           {"name": "Local setup (added)", "purpose": "Use the isolated environment; never install packages."},
+           {"name": "Step 1 · Find the tables", "purpose": "Detects which pages contain tables."},
+           {"name": "Step 2 · Extract", "purpose": "Converts each table to CSV and checks the totals."}
+         ]},
+        {"part": "references/edge-cases.md", "purpose": "How to handle merged cells and multi-page tables."},
+        {"part": "~/.venvs/pdf (outside synced folders)", "purpose": "Python with pdfplumber 0.11.4, pinned."}
+      ],
+      "left_out": ["The other 12 skills of the repository (forms, signatures, OCR): not needed.", "Its hook that ran on every message to watch for PDFs."],
+      "uninstall_extra": "Also delete ~/.venvs/pdf if no other skill uses it.",
+      "note": "note-pdf-tables.md"
+    },
+    {
+      "name": "free-tokens-proxy", "kind": "program", "location": null, "status": "rejected", "date": "2026-10-14",
+      "source": "someone · free-tokens-proxy",
+      "summary": "Proxy that reuses the subscription",
+      "what": "A local proxy that routes Claude's requests through third-party providers. (Fictional example.)",
+      "reasons": ["It holds every API key and reads every prompt.", "Reusing a subscription through a third party can break the terms of service."],
+      "note": "note-free-tokens-proxy.md"
+    }
+  ]
+}

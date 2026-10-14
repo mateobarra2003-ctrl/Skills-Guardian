@@ -1,0 +1,25 @@
+{
+  "name": "skills-guardian",
+  "owner": {
+    "name": "mateobarra2003-ctrl",
+    "url": "https://github.com/mateobarra2003-ctrl"
+  },
+  "metadata": {
+    "description": "Skills Guardian: a prudence protocol for installing skills, plugins and MCP servers in Claude Code."
+  },
+  "plugins": [
+    {
+      "name": "skills-guardian",
+      "source": "./",
+      "description": "Review skills, plugins and MCP servers before you install them, and keep a local HTML register of what you installed and why.",
+      "version": "1.0.0",
+      "author": {
+        "name": "mateobarra2003-ctrl"
+      },
+      "homepage": "https://github.com/mateobarra2003-ctrl/Skills-Guardian",
+      "license": "MIT",
+      "category": "security",
+      "keywords": ["skills", "security", "review", "registry"]
+    }
+  ]
+}
