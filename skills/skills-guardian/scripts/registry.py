@@ -147,9 +147,15 @@ def load(reg_path: Path) -> dict:
         return json.load(f)
 
 
+def write_text(path: Path, text: str) -> None:
+    """UTF-8 with LF line endings on every OS (Path.write_text has no `newline` before 3.10)."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="\n") as f:
+        f.write(text)
+
+
 def save(reg_path: Path, r: dict) -> None:
-    reg_path.parent.mkdir(parents=True, exist_ok=True)
-    reg_path.write_text(json.dumps(r, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_text(reg_path, json.dumps(r, ensure_ascii=False, indent=2) + "\n")
 
 
 def with_sep(p: Path) -> str:
@@ -250,8 +256,7 @@ def render(r: dict, reg_path: Path) -> Path:
     title = r.get("title") or TEXT[r.get("language", "en")]["title"]
     page = TITLE_TAG.sub(lambda m: f"<title>{html.escape(title)}</title>", page, count=1)
     out = resolve(r["html"], reg_path)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(page, encoding="utf-8", newline="\n")
+    write_text(out, page)
     return out
 
 
