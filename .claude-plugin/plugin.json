@@ -1,6 +1,6 @@
 {
   "name": "skills-guardian",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Review skills, plugins and MCP servers before you install them, and keep a local HTML register of what you installed and why.",
   "author": {
     "name": "Mateo Barra",

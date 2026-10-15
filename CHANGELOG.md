@@ -4,6 +4,14 @@ All notable changes to Skills Guardian are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] - 2026-10-15
+
+### Fixed
+- `SKILL.md` contained an example of the load-time command syntax (an exclamation mark followed
+  by a command in backticks). Claude Code treats that syntax as a command to run when the skill
+  loads, so the example itself was interpreted as one. The text now describes the syntax without
+  using it, and a test keeps it out of `SKILL.md`.
+
 ## [1.0.0] - 2026-10-14
 
 First public release.

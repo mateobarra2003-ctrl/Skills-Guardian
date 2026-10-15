@@ -12,7 +12,7 @@
       "name": "skills-guardian",
       "source": "./",
       "description": "Review skills, plugins and MCP servers before you install them, and keep a local HTML register of what you installed and why.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": {
         "name": "Mateo Barra"
       },

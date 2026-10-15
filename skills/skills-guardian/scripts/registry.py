@@ -26,7 +26,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 REPO_URL = "https://github.com/mateobarra2003-ctrl/Skills-Guardian"
 
 SKILL_DIR = Path(__file__).resolve().parent.parent

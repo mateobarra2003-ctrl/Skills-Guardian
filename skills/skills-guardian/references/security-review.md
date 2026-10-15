@@ -30,8 +30,9 @@ Review **every** file in the folder that would be installed, not only `SKILL.md`
 
 - **Hooks** (`hooks.json`, `hooks/`, a `"hooks"` key in `plugin.json`): they run **on their own**,
   on every session, message or tool call. This is the biggest risk. Understand what each one does.
-- **Automatic commands in `SKILL.md`**: lines like `` !`command` `` run when the skill loads.
-  Check which interpreter they call and whether they install anything.
+- **Automatic commands in `SKILL.md`**: an exclamation mark immediately followed by a command in
+  backticks runs that command when the skill loads. Search for the two characters together
+  (`grep -n '!`' SKILL.md`). Check which interpreter they call and whether they install anything.
 - **Scripts** (`.py`, `.js`, `.sh`, `.ps1`): look for network access (`fetch`, `requests`, `curl`,
   `http`), process execution (`child_process`, `subprocess`, `exec`, `eval`), credential reads
   (`.ssh`, `*_TOKEN`, `*_API_KEY`, keychains), writes outside the project, obfuscated code

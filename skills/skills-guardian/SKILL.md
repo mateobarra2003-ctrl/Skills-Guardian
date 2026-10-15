@@ -62,7 +62,8 @@ Follow `references/security-review.md`. In short:
 - Always: author, stars, license, activity and known vulnerabilities (CVEs).
 - If the source is **not** clearly trustworthy: read every file that would be installed.
 - Even if it is trustworthy: always read what **runs on its own** (hooks, scripts, MCP servers,
-  automatic `` !`command` `` lines in a `SKILL.md`) and look for `allowed-tools`.
+  and automatic command lines in a `SKILL.md`: an exclamation mark immediately followed by a
+  command in backticks, which Claude Code runs when the skill loads) and look for `allowed-tools`.
 
 Clone with `git clone --depth 1` into a **new, empty temporary folder**, never inside a project.
 Never run anything from the clone; analyze it with `python -I` if Python is needed. Nothing is

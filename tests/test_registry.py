@@ -213,6 +213,12 @@ class TestPackage(unittest.TestCase):
         self.assertRegex(name, r"^[a-z0-9]+(-[a-z0-9]+)*$")
         self.assertLessEqual(len(desc), 1024)
 
+    def test_skill_md_has_no_load_time_commands(self):
+        # Claude Code runs an exclamation mark followed by a backtick command when the skill loads.
+        # Skills Guardian must never run anything just by being loaded, not even in an example.
+        text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+        self.assertNotIn("!" + "`", text)
+
     def test_template_has_markers_and_both_languages(self):
         page = (SKILL / "assets" / "registry-template.html").read_text(encoding="utf-8")
         self.assertRegex(page, r"(?s)<!-- REGISTRY:START -->.*<!-- REGISTRY:END -->")
